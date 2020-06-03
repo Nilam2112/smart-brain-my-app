@@ -79,7 +79,7 @@ class App extends Component {
 
   onButtonSubmit = () => {
      this.setState({imageUrl: this.state.input});
-        fetch('http://morning-gorge-03974.herokuapp.com/imageurl', {
+        fetch('https://morning-gorge-68609.herokuapp.com/imageurl', {
             method: 'post',
             headers: {'Content-Type': 'application/json'},
             body: JSON.stringify({
@@ -89,7 +89,7 @@ class App extends Component {
       .then(response => response.json())
       .then(response => {
         if(response){
-          fetch('http://morning-gorge-03974.herokuapp.com/image', {
+          fetch('https://morning-gorge-68609.herokuapp.com/image', {
             method: 'put',
             headers: {'Content-Type': 'application/json'},
             body: JSON.stringify({
