@@ -23,7 +23,7 @@ const ParticlesOptions = {
 const initialState = {
       input: '',
       imageUrl: '',
-      boxes: {},
+      box: {},
       route: 'signin',
       isSignedIn: false,
       user: {
@@ -50,18 +50,18 @@ class App extends Component {
     }})
   }
 
-  // calculateFaceLocation = (data) =>{
-  //    const clarifaiFace = data.outputs[0].data.regions[0].region_info.bounding_box;
-  //    const image = document.getElementById('inputimage');
-  //    const width = Number(image.width);
-  //    const height = Number(image.height);
-  //    return {
-  //     leftCol: clarifaiFace.left_col * width,
-  //     topRow: clarifaiFace.top_row * height,
-  //     rightCol: width - (clarifaiFace.right_col * width),
-  //     bottomRow: height - (clarifaiFace.bottom_row * height)
-  //    }
-  // }
+  calculateFaceLocation = (data) =>{
+     const clarifaiFace = data.outputs[0].data.regions[0].region_info.bounding_box;
+     const image = document.getElementById('inputimage');
+     const width = Number(image.width);
+     const height = Number(image.height);
+     return {
+      leftCol: clarifaiFace.left_col * width,
+      topRow: clarifaiFace.top_row * height,
+      rightCol: width - (clarifaiFace.right_col * width),
+      bottomRow: height - (clarifaiFace.bottom_row * height)
+     }
+  }
 
   // componentDidMount() {
   //   fetch('http://localhost:3007')
@@ -69,37 +69,8 @@ class App extends Component {
   //   .then(console.log)
   // }
 
-    calculateFaceLocation = (region, width, height) => {
-    const faceRegion = region.region_info.bounding_box;
-
-    return {
-      leftCol: faceRegion.left_col * width,
-      topRow: faceRegion.top_row * height,
-      rightCol: width - faceRegion.right_col * width,
-      bottomRow: height - faceRegion.bottom_row * height,
-    }
-  }
-
-  calculateFacesLocation = (data) => {
-    if (data && data.outputs) {
-      const clarifaiFaceRegions = data.outputs[0].data.regions
-      const image = document.getElementById('inputimage')
-      const width = Number(image.width)
-      const height = Number(image.height)
-
-      const faceLocations = clarifaiFaceRegions.map((region) =>
-        this.calculateFaceLocation(region, width, height)
-      )
-
-      return faceLocations
-    }
-    return
-  }
-
-  displayFaceBox = (boxes) => {
-   if (boxes) {
-      this.setState({ boxes: boxes })
-    }
+  displayFaceBox = (box) => {
+    this.setState({box: box})
   }
 
   onInputChange = (event) => {
@@ -120,8 +91,7 @@ class App extends Component {
         if(response){
           fetch('https://morning-gorge-68609.herokuapp.com/image', {
             method: 'put',
-            headers: {'Content-Type': 'application/json',
-           Authorization: window.sessionStorage.getItem('token'),},
+            headers: {'Content-Type': 'application/json'},
             body: JSON.stringify({
             id: this.state.user.id
           })
@@ -132,7 +102,7 @@ class App extends Component {
           })
           .catch(console.log)
         }
-        this.displayFaceBox(this.calculateFacesLocation(response))
+        this.displayFaceBox(this.calculateFaceLocation(response))
       })
       .catch(err => console.log(err));
   }
@@ -147,7 +117,7 @@ onRouteChange = (route) => {
 }
 
   render(){
-   const { isSignedIn, imageUrl, route, boxes } = this.state;
+   const { isSignedIn, imageUrl, route, box } = this.state;
   return (
     <div className="App">
          <Particles className="particles" params={ParticlesOptions}/>
@@ -161,7 +131,7 @@ onRouteChange = (route) => {
             onInputChange={this.onInputChange} 
             onButtonSubmit={this.onButtonSubmit}
             /> 
-            <FaceRecognition boxes = {boxes} imageUrl={imageUrl}/>
+            <FaceRecognition box= {box} imageUrl={imageUrl}/>
         </div>
        : (
           route === 'signin' 
